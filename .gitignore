@@ -1,5 +1,12 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+dist-ssr/
+
 # Logs
-logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -7,27 +14,34 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Local env
+.env
+.env.*
+!.env.example
 *.local
 
-# Editor directories and files
+# Secrets / certs (DO NOT COMMIT)
+cert/
+*.pem
+*.key
+
+# Archives
+*.zip
+*.tar.gz
+
+# Build artifacts / packages
+artifacts/
+
+# Editor
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
-artifacts*
-.trae
-.github
-kyc-service
-main
-server
-verilocale-backend*
-cmd/kyc-loadtest/kyc-loadtest
-*.log*
+
+# Tooling
+.trae/

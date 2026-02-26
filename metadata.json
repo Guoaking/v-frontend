@@ -1,0 +1,7 @@
+{
+  "name": "Verilocale - AI E-KYC Platform",
+  "description": "Deeply localized AI E-KYC solutions for Southeast Asia. Enterprise-grade stability, OCR, and Face Liveness detection.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

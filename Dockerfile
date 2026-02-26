@@ -1,63 +1,47 @@
-# syntax=docker/dockerfile:1.5
-FROM golang:1.24-alpine AS builder
-
-# 安装构建依赖
-# ARG APK_REPO_MAIN=https://dl-cdn.alpinelinux.org/alpine/v3.19/main
-# ARG APK_REPO_COMMUNITY=https://dl-cdn.alpinelinux.org/alpine/v3.19/community
-
-# ARG APK_REPO_MAIN=http://mirrors.aliyun.com/alpine/v3.19/main
-# ARG APK_REPO_COMMUNITY=http://mirrors.aliyun.com/alpine/v3.19/community
-# RUN --mount=type=cache,target=/var/cache/apk apk add --no-cache --repository=${APK_REPO_MAIN} --repository=${APK_REPO_COMMUNITY} git ca-certificates
-RUN --mount=type=cache,target=/var/cache/apk apk add --no-cache  git ca-certificates
-
-# 设置工作目录
+# Stage 1: 构建
+FROM node:20-alpine AS builder
 WORKDIR /app
 
-# 复制go mod文件
-COPY go.mod go.sum ./
-ENV GOPROXY=https://proxy.golang.org,direct
-RUN --mount=type=cache,target=/go/pkg/mod go mod download
+# 安装依赖
+COPY package*.json ./
+RUN npm ci
 
-# 复制源代码
+# 拷贝源码
 COPY . .
 
-# 构建应用
-RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg/mod CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o kyc-service ./cmd/server
+# 生成静态文件
+RUN npm run build
 
-# 运行时镜像
-FROM alpine:3.19
+# Stage 2: 运行（Nginx 提供静态文件）
+FROM nginx:alpine AS runner
 
-# 安装运行时依赖
-# ARG APK_REPO_MAIN=https://dl-cdn.alpinelinux.org/alpine/v3.19/main
-# ARG APK_REPO_COMMUNITY=https://dl-cdn.alpinelinux.org/alpine/v3.19/community
-# RUN --mount=type=cache,target=/var/cache/apk apk add --no-cache --repository=${APK_REPO_MAIN} --repository=${APK_REPO_COMMUNITY} ca-certificates tzdata
-RUN --mount=type=cache,target=/var/cache/apk apk add --no-cache  ca-certificates tzdata
 
-# 创建非root用户
-RUN addgroup -g 1000 -S appuser && \
-    adduser -u 1000 -S appuser -G appuser
+RUN apk add --no-cache bash
 
-# 设置工作目录
-WORKDIR /app
+WORKDIR /usr/share/nginx/html
 
-# 复制二进制文件
-COPY --from=builder /app/kyc-service .
-COPY --from=builder /app/config.yaml .
+# 运行时根据环境变量生成 env.js（无需安装 gettext）
 
-# 创建日志目录
-RUN mkdir -p /app/logs && chown -R appuser:appuser /app
+# 拷贝静态资源
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-# 切换到非root用户
-USER appuser
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# 默认端口（可被环境变量覆盖）
-ENV KYC_PORT=8082
-EXPOSE 8082
-EXPOSE 8092
 
-# 健康检查改为指标端点（避免鉴权导致401）
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD sh -c "wget --no-verbose --tries=1 --spider http://localhost:${KYC_PORT}/metrics || exit 1"
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-# 启动命令
-CMD ["./kyc-service"]
+# 直接在启动时写入 env.js（展开环境变量）
+
+EXPOSE 80
+EXPOSE 443
+EXPOSE 3002
+EXPOSE 3003
+
+
+# 仅静态部署（构建期注入）：直接启动 Nginx
+# CMD ["nginx", "-g", "daemon off;"]
+
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["nginx", "-g", "daemon off;"]

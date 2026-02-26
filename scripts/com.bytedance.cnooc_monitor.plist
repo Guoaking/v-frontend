@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.bytedance.cnooc_monitor</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/bytedance/Downloads/verilocale---ai-e-kyc-platform-1/scripts/monitor_cnooc.sh</string>
+    </array>
+
+    <key>StartInterval</key>
+    <integer>300</integer>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/cnooc_monitor.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/tmp/cnooc_monitor.err</string>
+
+    <key>RunAtLoad</key>
+    <true/>
+</dict>
+</plist>

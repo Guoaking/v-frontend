@@ -1,0 +1,39 @@
+name: Generate Swagger
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  swagger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.x'
+
+      - name: Install swag
+        run: go install github.com/swaggo/swag/cmd/swag@latest
+
+      - name: Generate swagger.json
+        run: |
+          ./scripts/gen-swagger.sh
+          ./scripts/gen-swagger-public.sh
+
+      - name: Upload swagger artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: swagger.json
+          path: docs/swagger.json
+
+      - name: Upload swagger public artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: swagger-public.json
+          path: docs/public/swagger.json

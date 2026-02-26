@@ -1,0 +1,476 @@
+
+import { DocSection, Language, ApiField, ApiResponseDef } from './types';
+
+// Standard Base Response Fields (inherited by all responses)
+const BASE_RESPONSE_FIELDS: ApiField[] = [
+    { name: 'code', type: 'integer', description: 'Business response code. 0 usually means success.', required: true },
+    { name: 'message', type: 'string', description: 'Response message or error description.', required: true },
+    { name: 'timestamp', type: 'integer', description: 'Server timestamp (milliseconds).', required: true },
+    { name: 'request_id', type: 'string', description: 'Unique ID for request tracing.', required: true },
+];
+
+const API_DOCS_EN: DocSection[] = [
+    {
+        id: 'intro',
+        title: 'Introduction',
+        content: 'Verilocale API provides AI-powered identity verification services specialized for Southeast Asia. Our core capabilities include OCR for local ID documents, passive liveness detection, and face recognition. All endpoints follow a standard JSON response envelope.',
+        subsections: [
+            { 
+                id: 'response_format', 
+                title: 'Standard Response', 
+                content: 'Every API response shares a common envelope structure (BaseResponse).',
+                api: {
+                    method: 'GET',
+                    path: '/any/endpoint',
+                    description: 'Structure of the base response wrapper.',
+                    requestBody: [],
+                    responses: [
+                        {
+                            code: 200,
+                            description: 'Standard Success Wrapper',
+                            schema: [
+                                ...BASE_RESPONSE_FIELDS,
+                                { name: 'data', type: 'object', description: 'The payload specific to the requested endpoint.', required: false }
+                            ],
+                            example: `{
+  "code": 0,
+  "message": "success",
+  "timestamp": 1715048291000,
+  "request_id": "req_123abc",
+  "data": { ... }
+}`
+                        },
+                        {
+                            code: 400,
+                            description: 'Standard Error Wrapper',
+                            schema: [
+                                ...BASE_RESPONSE_FIELDS,
+                                { name: 'error', type: 'string', description: 'Detailed technical error message.', required: false },
+                                { name: 'errors', type: 'array', description: 'List of field validation errors.', required: false }
+                            ],
+                            example: `{
+  "code": 4001,
+  "message": "Invalid Parameters",
+  "timestamp": 1715048291000,
+  "request_id": "req_err_456",
+  "error": "Image file is missing"
+}`
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        id: 'auth_intro',
+        title: 'Authorization',
+        content: ``,
+        subsections: [
+                {
+        id: 'a_desc',
+        title: 'Description',
+        content: `Verilocale supports two methods of authentication:
+
+1. **API Keys**: Simple mechanism for server-side scripts. Pass via \`Authorization: Bearer <API_KEY>\`.
+2. **OAuth 2.0 (Client Credentials)**: Recommended for secure, automated server-to-server communication.
+
+### OAuth 2.0 Flow
+1. **Register Application**: Create a client in the "My Apps" section (bottom left of sidebar) to obtain a \`client_id\` and \`client_secret\`.
+2. **Obtain Token**: Call \`POST /api/v1/oauth/token\` with your credentials.
+3. **Use Token**: Pass the \`access_token\` in the header: \`Authorization: Bearer <ACCESS_TOKEN>\`.
+4. **Refresh**: When the token expires (default 24h), use the \`refresh_token\` to get a new one.`},
+            { 
+                id: 'auth_token', 
+                title: 'Get Token', 
+                content: 'Exchange your Client ID and Client Secret for an Access Token.',
+                api: {
+                    method: 'POST',
+                    path: '/oauth/token',
+                    description: 'Exchange Client Credentials for an Access Token.',
+                    requestBody: [
+                        { name: 'client_id', type: 'string', required: true, description: 'Your Application ID.' },
+                        { name: 'client_secret', type: 'string', required: true, description: 'Your Application Secret.' },
+                        { name: 'grant_type', type: 'string', required: true, description: 'Must be "client_credentials".' },
+                        { name: 'scope', type: 'string', required: false, description: 'Space-separated scopes (e.g. "ocr:read face:read"). If omitted, uses default scopes.' }
+                    ],
+                    responses: [
+                        {
+                            code: 200,
+                            description: 'Token Response',
+                            schema: [
+                                { name: 'access_token', type: 'string', description: 'JWT Access Token', required: true },
+                                { name: 'token_type', type: 'string', description: 'Always "Bearer"', required: true },
+                                { name: 'expires_in', type: 'integer', description: 'Seconds until expiration (default 86400)', required: true },
+                                { name: 'refresh_token', type: 'string', description: 'Token to request a new access token', required: true },
+                                { name: 'scope', type: 'string', description: 'Granted scopes', required: true }
+                            ],
+                            example: `{
+  "access_token": "eyJhbGciOiJIUzI1Ni...",
+  "token_type": "Bearer",
+  "expires_in": 86400,
+  "refresh_token": "def50200...",
+  "scope": "ocr:read face:read"
+}`
+                        }
+                    ]
+                }
+            },
+            {
+                id: 'auth_refresh',
+                title: 'Refresh Token',
+                content: 'Obtain a new access token using a valid refresh token.',
+                api: {
+                    method: 'POST',
+                    path: '/oauth/refresh',
+                    description: 'Refresh an expired access token.',
+                    requestBody: [
+                        { name: 'refresh_token', type: 'string', required: true, description: 'The refresh token received from the initial token request.' },
+                        { name: 'client_id', type: 'string', required: true, description: 'Your Application ID.' }
+                    ],
+                    responses: [
+                        {
+                            code: 200,
+                            description: 'New Token Response',
+                            schema: [
+                                { name: 'access_token', type: 'string', description: 'New JWT Access Token', required: true },
+                                { name: 'token_type', type: 'string', description: 'Always "Bearer"', required: true },
+                                { name: 'expires_in', type: 'integer', description: 'Seconds until expiration', required: true },
+                                { name: 'refresh_token', type: 'string', description: 'New refresh token', required: true },
+                                { name: 'scope', type: 'string', description: 'Granted scopes', required: true }
+                            ],
+                            example: `{
+  "access_token": "eyJhbGciOiJIUzI1Ni...",
+  "token_type": "Bearer",
+  "expires_in": 86400,
+  "refresh_token": "def50200...",
+  "scope": "ocr:read face:read"
+}`
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        id: 'ocr',
+        title: 'OCR API',
+        content: 'Extract data from ID cards, passports, and driver licenses. Specialized for Thai, Vietnamese, Indonesian, and Malaysian documents. Supports automatic rotation and glare handling.',
+        api: {
+            method: 'POST',
+            path: '/kyc/ocr',
+            description: 'Upload an image of an ID document to extract text fields.',
+            requestBody: [
+                { name: 'image', type: 'file', required: true, description: 'Image file (JPG/PNG/WEBP). Max 10MB.' },
+                { 
+                    name: 'type', 
+                    type: 'string', 
+                    required: true, 
+                    description: 'Document type.',
+                    enum: ['id_card', 'driver_license', 'bank_card', 'vehicle_license', 'business_license', 'general']
+                },
+                { name: 'language', type: 'string', required: false, description: 'Target language hint (e.g., "th", "en", "cn", "auto"). Default: "auto".' }
+            ],
+            responses: [
+                { 
+                    code: 200, 
+                    description: 'Successful Extraction', 
+                    schema: [
+                        ...BASE_RESPONSE_FIELDS,
+                        {
+                            name: 'data',
+                            type: 'object',
+                            description: 'OCR Results',
+                            required: true,
+                            children: [
+                                {
+                                    name: 'parsing_results',
+                                    type: 'object',
+                                    description: 'Key-value pairs of extracted fields.',
+                                    required: true,
+                                    children: [
+                                        { name: 'id_number', type: 'object', description: '{ text: string, confidence: number }', required: false },
+                                        { name: 'name_th', type: 'object', description: '{ text: string, confidence: number } (Thai Name)', required: false },
+                                        { name: 'name_en', type: 'object', description: '{ text: string, confidence: number } (English Name)', required: false },
+                                        { name: 'date_of_birth', type: 'object', description: '{ text: string, confidence: number }', required: false },
+                                        { name: 'address', type: 'object', description: '{ text: string, confidence: number }', required: false },
+                                    ]
+                                },
+                                {
+                                    name: 'meta',
+                                    type: 'object',
+                                    description: 'Processing metadata',
+                                    children: [
+                                        { name: 'latency_ms', type: 'integer', description: 'Processing time in milliseconds', required: true }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    example: `{
+  "code": 0,
+  "message": "success",
+  "timestamp": 1715049000,
+  "request_id": "ocr_req_789",
+  "data": {
+    "parsing_results": {
+      "id_number": { "text": "1 1005 01234 56 7", "confidence": 0.99 },
+      "name_en": { "text": "Mr. Sommut Namsakul", "confidence": 0.98 },
+      "date_of_birth": { "text": "2535-05-20", "confidence": 0.99 }
+    },
+    "meta": { "latency_ms": 145 }
+  }
+}` 
+                }
+            ],
+            playgroundLink: 'cat=ocr'
+        }
+    },
+    {
+        id: 'face_detect',
+        title: 'Face Detection',
+        content: 'Detect faces in an image and return bounding boxes and key landmarks (eyes).',
+        api: {
+            method: 'POST',
+            path: '/kyc/face/detect',
+            description: 'Analyze an image for human faces.',
+            requestBody: [
+                { name: 'picture', type: 'file', required: true, description: 'Image containing face(s).' }
+            ],
+            responses: [
+                {
+                    code: 200,
+                    description: 'Face Detection Result',
+                    schema: [
+                        ...BASE_RESPONSE_FIELDS,
+                        {
+                            name: 'data',
+                            type: 'object',
+                            description: 'Detection Data',
+                            children: [
+                                {
+                                    name: 'detection_results',
+                                    type: 'object',
+                                    description: '',
+                                    children: [
+                                        { name: 'is_face_exist', type: 'integer', description: '1 if face detected, 0 otherwise', required: true },
+                                        { name: 'face_num', type: 'integer', description: 'Number of faces detected', required: true },
+                                        { 
+                                            name: 'faces_detected', 
+                                            type: 'array', 
+                                            description: 'List of detected faces details',
+                                            children: [
+                                                { 
+                                                    name: 'facial_area', 
+                                                    type: 'object', 
+                                                    description: 'Bounding box {x, y, w, h} and landmarks', 
+                                                    required: true
+                                                },
+                                                { name: 'confidence', type: 'number', description: 'Detection confidence (0.0 - 1.0)', required: true }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    example: `{
+  "code": 0,
+  "message": "success",
+  "request_id": "face_det_001",
+  "data": {
+    "detection_results": {
+      "is_face_exist": 1,
+      "face_num": 1,
+      "faces_detected": [
+        {
+          "facial_area": { "x": 100, "y": 120, "w": 200, "h": 200, "left_eye": [150, 180], "right_eye": [250, 180] },
+          "confidence": 0.99
+        }
+      ]
+    }
+  }
+}`
+                }
+            ],
+            playgroundLink: 'cat=face&feature=face_detection'
+        }
+    },
+    {
+        id: 'face_compare',
+        title: 'Face Comparison (1:1)',
+        content: 'Compare a selfie against an ID photo to verify if they belong to the same person.',
+        api: {
+            method: 'POST',
+            path: '/kyc/face/compare',
+            description: 'Compare two face images and get a similarity score.',
+            requestBody: [
+                { name: 'source_image', type: 'file', required: true, description: 'Reference image (e.g., from ID card)' },
+                { name: 'target_image', type: 'file', required: true, description: 'Comparison image (e.g., Selfie)' }
+            ],
+            responses: [
+                { 
+                    code: 200, 
+                    description: 'Comparison Result', 
+                    schema: [
+                        ...BASE_RESPONSE_FIELDS,
+                        {
+                            name: 'data',
+                            type: 'object',
+                            description: 'Comparison Data',
+                            children: [
+                                {
+                                    name: 'comparison_results',
+                                    type: 'object',
+                                    description: 'Face comparison details',
+                                    children: [
+                                        { name: 'is_same_face', type: 'integer', description: '1 = Match, 0 = No Match', required: true },
+                                        { name: 'confidence', type: 'number', description: 'Similarity score (0-100)', required: true },
+                                        { name: 'confidence_exist', type: 'array', description: '[source_confidence, target_confidence]', required: false }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    example: `{
+  "code": 0,
+  "message": "success",
+  "request_id": "face_cmp_002",
+  "data": {
+    "comparison_results": {
+      "is_face_exist": 1,
+      "is_same_face": 1,
+      "confidence": 98.5,
+      "detection_result": "success"
+    }
+  }
+}` 
+                }
+            ],
+            playgroundLink: 'cat=face&feature=face_compare'
+        }
+    },
+    {
+        id: 'face_search',
+        title: 'Face Search (1:N)',
+        content: 'Search for a face in the enrolled database to identify a person. Useful for duplicate checks or biometric authentication.',
+        api: {
+            method: 'POST',
+            path: '/kyc/face/search',
+            description: 'Search for a face image against the enrolled gallery.',
+            requestBody: [
+                { name: 'picture', type: 'file', required: true, description: 'Image containing the face to search.' },
+                { name: 'limit', type: 'integer', required: false, description: 'Max number of results. Default: 5.' }
+            ],
+            responses: [
+                {
+                    code: 200,
+                    description: 'Search Results',
+                    schema: [
+                        ...BASE_RESPONSE_FIELDS,
+                        {
+                            name: 'data',
+                            type: 'object',
+                            description: 'Search Data',
+                            children: [
+                                {
+                                    name: 'searching_results',
+                                    type: 'object',
+                                    description: '',
+                                    children: [
+                                        { name: 'has_similar_picture', type: 'integer', description: '1 if match found, 0 otherwise', required: true },
+                                        { 
+                                            name: 'searched_similar_pictures', 
+                                            type: 'array', 
+                                            description: 'List of matching faces',
+                                            children: [
+                                                { name: 'picture', type: 'string', description: 'URL/Path of matched face', required: true },
+                                                { name: 'confidence', type: 'number', description: 'Similarity score', required: true },
+                                                { name: 'id', type: 'string', description: 'Unique ID of enrolled face', required: false }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    example: `{
+  "code": 0,
+  "message": "success",
+  "request_id": "face_search_005",
+  "data": {
+    "searching_results": {
+      "has_similar_picture": 1,
+      "searched_similar_pictures": [
+        {
+          "id": "user_12345",
+          "picture": "https://api.verilocale.com/faces/user_12345.jpg",
+          "confidence": 99.2
+        }
+      ]
+    }
+  }
+}`
+                }
+            ],
+            playgroundLink: 'cat=face&feature=face_search'
+        }
+    },
+    {
+        id: 'liveness',
+        title: 'Liveness Detection',
+        content: 'Determine if a face is a real person or a spoof attack (screen, photo, mask).',
+        api: {
+            method: 'POST',
+            path: '/kyc/liveness/silent',
+            description: 'Perform silent passive liveness detection on a single image.',
+            requestBody: [
+                { name: 'picture', type: 'file', required: true, description: 'Selfie image.' }
+            ],
+            responses: [
+                {
+                    code: 200,
+                    description: 'Liveness Result',
+                    schema: [
+                        ...BASE_RESPONSE_FIELDS,
+                        {
+                            name: 'data',
+                            type: 'object',
+                            description: 'Liveness Data',
+                            children: [
+                                {
+                                    name: 'liveness_result',
+                                    type: 'object',
+                                    description: 'Liveness analysis',
+                                    children: [
+                                        { name: 'is_live', type: 'integer', description: '1 = Live, 0 = Spoof', required: true },
+                                        { name: 'liveness_confidence', type: 'number', description: 'Confidence score (0.0 - 1.0)', required: true },
+                                        { name: 'face_confidence', type: 'number', description: 'Face quality score', required: true }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    example: `{
+  "code": 0,
+  "message": "success",
+  "request_id": "live_003",
+  "data": {
+    "liveness_result": {
+      "is_live": 1,
+      "liveness_confidence": 0.992,
+      "face_confidence": 0.98
+    }
+  }
+}`
+                }
+            ],
+            playgroundLink: 'cat=liveness'
+        }
+    }
+];
+
+export const DOCS_DATA: Record<Language, DocSection[]> = {
+    en: API_DOCS_EN,
+    th: API_DOCS_EN, // Fallback content for now
+    zh: API_DOCS_EN  // Fallback content for now
+};
