@@ -135,6 +135,17 @@ export const Playground: React.FC = () => {
 
   const handleFeatureSelect = (feature: string) => {
       if (feature === selectedFeature) return;
+      
+      // Special handling for liveness features with dedicated pages
+      if (feature === 'action_liveness') {
+          navigate('/action-liveness');
+          return;
+      }
+      if (feature === 'rgb_liveness') {
+          navigate('/rgb-liveness');
+          return;
+      }
+      
       setIsSwitching(true);
       navigate(`/playground/${feature}`);
       setTimeout(() => { setIsSwitching(false); }, 300);

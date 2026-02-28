@@ -228,6 +228,8 @@ export const tl: Translation = {
       general_ocr: 'Pangkalahatang Pagkilala sa Teksto',
       liveness_silent: 'Tahimik na Liveness',
       liveness_video: 'Video Liveness',
+      action_liveness: 'Action Liveness',
+      rgb_liveness: 'RGB Liveness',
       face_detection: 'Pag-detect ng Mukha',
       face_compare: 'Paghahambing ng Mukha (1:1)',
       face_search: 'Paghahanap ng Mukha (1:N)',

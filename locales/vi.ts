@@ -228,6 +228,8 @@ export const vi: Translation = {
       general_ocr: 'Nhận dạng văn bản chung',
       liveness_silent: 'Sự sống im lặng',
       liveness_video: 'Sự sống video',
+      action_liveness: 'Action Liveness',
+      rgb_liveness: 'RGB Liveness',
       face_detection: 'Phát hiện khuôn mặt',
       face_compare: 'So sánh khuôn mặt (1:1)',
       face_search: 'Tìm kiếm khuôn mặt (1:N)',

@@ -24,6 +24,8 @@ import { AccountLayout } from './pages/account/Layout';
 import { AccountProfile } from './pages/account/Profile';
 import { AccountSecurity } from './pages/account/Security';
 import { AccountPreferences } from './pages/account/Preferences';
+import { ActionLiveness } from './pages/ActionLiveness';
+import { RgbLiveness } from './pages/RgbLiveness';
 
 // Re-export for backward compatibility
 export { useLanguage };
@@ -171,6 +173,10 @@ const App: React.FC = () => {
                         
                         {/* Onboarding Route */}
                         <Route path="/onboarding" element={<Onboarding />} />
+                        
+                        {/* Liveness Routes */}
+                        <Route path="/action-liveness" element={<ActionLiveness />} />
+                        <Route path="/rgb-liveness" element={<RgbLiveness />} />
                     </Route>
                     
                     {/* Console/Admin Routes (Already Protected) */}

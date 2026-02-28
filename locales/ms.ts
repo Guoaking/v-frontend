@@ -228,6 +228,8 @@ export const ms: Translation = {
       general_ocr: 'Pengecaman Teks Umum',
       liveness_silent: 'Liveness Senyap',
       liveness_video: 'Liveness Video',
+      action_liveness: 'Action Liveness',
+      rgb_liveness: 'RGB Liveness',
       face_detection: 'Pengesanan Wajah',
       face_compare: 'Perbandingan Wajah (1:1)',
       face_search: 'Carian Wajah (1:N)',

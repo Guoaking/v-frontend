@@ -230,6 +230,8 @@ export const zh: Translation = {
       th_vat_ocr: '税务文件',
       liveness_silent: '静默活体',
       liveness_video: '视频活体',
+      action_liveness: '动作活体',
+      rgb_liveness: 'RGB 活体',
       face_detection: '人脸检测',
       face_compare: '人脸比对 (1:1)',
       face_search: '人脸搜索 (1:N)',

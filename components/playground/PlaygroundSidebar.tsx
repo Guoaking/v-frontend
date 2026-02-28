@@ -41,6 +41,7 @@ export const PlaygroundSidebar: React.FC<PlaygroundSidebarProps> = ({
                         return (
                             <button
                                 key={item}
+                                data-testid={`feature-item-${item}`}
                                 onClick={() => onFeatureSelect(item)}
                                 className={`w-full text-left px-3 py-2 text-xs rounded-md transition-all flex items-center justify-between group relative overflow-hidden ${
                                     isActive 

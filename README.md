@@ -2,6 +2,10 @@
 
 本仓库是 `v-backend` 的对应前端项目：基于 **React + Vite + TypeScript**，提供控制台/管理端界面，并包含一个基于 Gemini 的“知识库问答”侧边助手（缺少 Key 时自动降级）。
 
+## Quick Links
+
+- Runbook (Start Here): `docs/runbook/README.md`
+
 ## 知识库
 
 - AI First 前端实现知识库：`docs/AI_FIRST_FRONTEND_KB.md`
@@ -57,7 +61,3 @@ npm run dev
 # 完整校验：强制 npm ci + typecheck + build + 基础安全检查
 ./scripts/test-all.sh
 ```
-
-## 安全提醒
-
-- `cert/privkey.pem` 属于私钥文件，已通过 `.gitignore` 排除（严禁提交）。

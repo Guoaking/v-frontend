@@ -229,6 +229,8 @@ export const id: Translation = {
       id_npwp_ocr: 'OCR NPWP (Pajak)',
       liveness_silent: 'Liveness Diam',
       liveness_video: 'Liveness Video',
+      action_liveness: 'Action Liveness',
+      rgb_liveness: 'RGB Liveness',
       face_detection: 'Deteksi Wajah',
       face_compare: 'Perbandingan Wajah (1:1)',
       face_search: 'Pencarian Wajah (1:N)',

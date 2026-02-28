@@ -229,6 +229,8 @@ export const th: Translation = {
       th_vat_ocr: 'OCR เอกสารภาษี',
       liveness_silent: 'Liveness แบบเงียบ',
       liveness_video: 'Liveness แบบวิดีโอ',
+      action_liveness: 'Action Liveness',
+      rgb_liveness: 'RGB Liveness',
       face_detection: 'ตรวจจับใบหน้า',
       face_compare: 'เปรียบเทียบใบหน้า (1:1)',
       face_search: 'ค้นหาใบหน้า (1:N)',

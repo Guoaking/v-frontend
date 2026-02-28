@@ -228,6 +228,8 @@ export const my: Translation = {
       general_ocr: 'General Text Recognition',
       liveness_silent: 'Silent Liveness',
       liveness_video: 'Video Liveness',
+      action_liveness: 'Action Liveness',
+      rgb_liveness: 'RGB Liveness',
       face_detection: 'Face Detection',
       face_compare: 'Face Comparison (1:1)',
       face_search: 'Face Search (1:N)',

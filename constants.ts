@@ -98,6 +98,7 @@ export const PRODUCT_STRUCTURE = [
     icon: Fingerprint,
     items: [
       'liveness_silent',
+      'action_liveness',
       // 'liveness_video',
     ]
   }
@@ -118,7 +119,8 @@ export const COUNTRY_CAPABILITIES: EnhancedCountryConfig[] = [
         accentColor: '#6366f1',
         features: [
             'id_card_ocr', 'driver_license_ocr', 'vehicle_license_ocr', 'bank_card_ocr', 'business_license_ocr', 'th_vat_ocr', 'general_ocr',
-            'face_detection', 'face_compare', 'face_search', 'liveness_silent'
+            'face_detection', 'face_compare', 'face_search', 'liveness_silent',
+            'action_liveness', 'rgb_liveness'
         ]
     },
     {
@@ -129,7 +131,8 @@ export const COUNTRY_CAPABILITIES: EnhancedCountryConfig[] = [
         accentColor: '#ef4444',
         features: [
             'id_card_ocr', 'driver_license_ocr', 'vehicle_license_ocr', 'bank_card_ocr', 'business_license_ocr', 'general_ocr',
-            'face_detection', 'face_compare', 'face_search', 'liveness_silent'
+            'face_detection', 'face_compare', 'face_search', 'liveness_silent',
+            'action_liveness', 'rgb_liveness'
         ]
     },
     {
@@ -141,7 +144,8 @@ export const COUNTRY_CAPABILITIES: EnhancedCountryConfig[] = [
         features: [
             'id_card_ocr', 'driver_license_ocr', 
             'vehicle_license_ocr', 'bank_card_ocr', 'business_license_ocr','id_npwp_ocr',  'general_ocr',
-            'face_detection', 'face_compare', 'face_search', 'liveness_silent'
+            'face_detection', 'face_compare', 'face_search', 'liveness_silent',
+            'action_liveness', 'rgb_liveness'
         ]
     },
     {
@@ -153,7 +157,8 @@ export const COUNTRY_CAPABILITIES: EnhancedCountryConfig[] = [
         features: [
             'id_card_ocr', 'driver_license_ocr', 
             'vehicle_license_ocr', 'bank_card_ocr', 'business_license_ocr',  'general_ocr',
-            'face_detection', 'face_compare', 'face_search', 'liveness_silent'
+            'face_detection', 'face_compare', 'face_search', 'liveness_silent',
+            'action_liveness', 'rgb_liveness'
         ]
     },
     {
@@ -165,7 +170,8 @@ export const COUNTRY_CAPABILITIES: EnhancedCountryConfig[] = [
         features: [
             'id_card_ocr', 'driver_license_ocr', 
             'vehicle_license_ocr', 'bank_card_ocr', 'business_license_ocr',  'general_ocr',
-            'face_detection', 'face_compare', 'face_search', 'liveness_silent'
+            'face_detection', 'face_compare', 'face_search', 'liveness_silent',
+            'action_liveness', 'rgb_liveness'
         ]
     },
     {
@@ -177,7 +183,8 @@ export const COUNTRY_CAPABILITIES: EnhancedCountryConfig[] = [
         features: [
             'id_card_ocr', 'driver_license_ocr', 
             'vehicle_license_ocr', 'bank_card_ocr', 'business_license_ocr',  'general_ocr',
-            'face_detection', 'face_compare', 'face_search', 'liveness_silent'
+            'face_detection', 'face_compare', 'face_search', 'liveness_silent',
+            'action_liveness', 'rgb_liveness'
         ]
     }
 ];
@@ -211,6 +218,9 @@ export const FEATURE_CONFIG: Record<string, FeatureConfig> = {
     // Liveness Features
     liveness_silent: { mode: 'single-image', endpoint: '/kyc/liveness/silent', label: 'Silent Liveness', category: 'liveness' },
     liveness_video: { mode: 'video', endpoint: '/kyc/liveness/video', label: 'Video Liveness', category: 'liveness' },
+    action_liveness: { mode: 'video', endpoint: '/kyc/liveness/action/session', label: 'Action Liveness', category: 'liveness' },
+    rgb_liveness: { mode: 'video', endpoint: '/kyc/liveness/rgb/session', label: 'RGB Liveness', category: 'liveness' },
+
 };
 
 export const OCR_TYPE_MAPPING: Record<string, string> = {
