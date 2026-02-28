@@ -18,14 +18,17 @@
 npm ci
 ```
 
-### 2) 配置环境变量（可选）
+### 2) 配置环境变量（可选，但推荐）
 
 本项目通过 Vite 读取环境变量（`import.meta.env.*`），同时为了兼容 AI Studio 模板，`vite.config.ts` 会把 `GEMINI_API_KEY` 注入为 `process.env.API_KEY`：`vite.config.ts:18`。
 
 建议创建 `.env.local`（不要提交）：
 
 ```bash
-# 后端 API（默认 http://localhost:8082/api/v1）
+# 后端 API
+# - 本机同机部署：默认可用 http://localhost:8082/api/v1
+# - VM / 跨容器 / 远程后端：必须改成可路由的 IP/域名
+#   例如：VITE_API_BASE_URL=http://192.168.64.4:8082/api/v1
 VITE_API_BASE_URL=http://localhost:8082/api/v1
 
 # 是否启用 mock（默认 false）
@@ -38,6 +41,7 @@ VITE_GOOGLE_CLIENT_ID=YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com
 GEMINI_API_KEY=YOUR_GEMINI_API_KEY
 ```
 
+（推荐）也可从模板复制：`cp .env.example .env.local` 然后再改。
 ### 3) 启动开发服务
 
 ```bash
